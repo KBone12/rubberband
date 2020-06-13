@@ -1,0 +1,15 @@
+[package]
+name = "rubberband"
+version = "0.1.0"
+authors = ["kbone <kbonehobby@gmail.com>"]
+edition = "2018"
+license = "GPL-2.0+"
+description = "safe Rubber Band Library binding"
+repository = "https://github.com/KBone12/rubberband"
+keywords = ["Rubber Band", "audio", "time stretch", "pitch shift"]
+categories = ["audio", "external-ffi-bindings"]
+
+[dependencies]
+bitflags = "1.2.1"
+rubberband-sys = { path = "../rubberband-sys" }
+thiserror = "1.0.19"

@@ -1,0 +1,2 @@
+[workspace]
+members = ["rubberband-sys", "rubberband"]
