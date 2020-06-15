@@ -68,10 +68,11 @@ impl OfflineStretcher {
     /// stretcher.study(&input, true);
     /// ```
     pub fn study<I: AsRef<[f32]>>(&mut self, input: &[I], last: bool) {
-        if let Some(head) = input.first() {
-            let head: *const *const f32 = &head.as_ref().as_ptr();
+        // Convert a 2-dimensional vector to a vector of a pointer.
+        let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
+        if input.len() > 0 {
             unsafe {
-                rubberband_study(self.inner, head, input.len() as _, last as _);
+                rubberband_study(self.inner, input.as_ptr(), input.len() as _, last as _);
             }
         } else {
             unsafe {
@@ -95,10 +96,11 @@ impl OfflineStretcher {
             return;
         }
 
-        if let Some(head) = input.first() {
-            let head: *const *const f32 = &head.as_ref().as_ptr();
+        // Convert a 2-dimensional vector to a vector of a pointer.
+        let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
+        if input.len() > 0 {
             unsafe {
-                rubberband_process(self.inner, head, input.len() as _, last as _);
+                rubberband_process(self.inner, input.as_ptr(), input.len() as _, last as _);
             }
         } else {
             unsafe {
@@ -137,9 +139,10 @@ impl OfflineStretcher {
     /// }
     /// ```
     pub fn retrieve<O: AsMut<[f32]>>(&mut self, output: &mut [O]) -> usize {
-        if let Some(head) = output.first_mut() {
-            let head: *const *mut f32 = &head.as_mut().as_mut_ptr();
-            unsafe { rubberband_retrieve(self.inner, head, output.len() as _) as _ }
+        // Convert a 2-dimensional vector to a vector of a pointer.
+        let output: Vec<_> = output.iter_mut().map(|o| o.as_mut().as_mut_ptr()).collect();
+        if output.len() > 0 {
+            unsafe { rubberband_retrieve(self.inner, output.as_ptr(), output.len() as _) as _ }
         } else {
             0
         }
@@ -454,10 +457,11 @@ impl RealTimeStretcher {
     /// stretcher.process(&input, true);
     /// ```
     pub fn process<I: AsRef<[f32]>>(&mut self, input: &[I], last: bool) {
-        if let Some(head) = input.first() {
-            let head: *const *const f32 = &head.as_ref().as_ptr();
+        // Convert a 2-dimensional vector to a vector of a pointer.
+        let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
+        if input.len() > 0 {
             unsafe {
-                rubberband_process(self.inner, head, input.len() as _, last as _);
+                rubberband_process(self.inner, input.as_ptr(), input.len() as _, last as _);
             }
         } else {
             unsafe {
@@ -496,9 +500,10 @@ impl RealTimeStretcher {
     /// }
     /// ```
     pub fn retrieve<O: AsMut<[f32]>>(&mut self, output: &mut [O]) -> usize {
-        if let Some(head) = output.first_mut() {
-            let head: *const *mut f32 = &head.as_mut().as_mut_ptr();
-            unsafe { rubberband_retrieve(self.inner, head, output.len() as _) as _ }
+        // Convert a 2-dimensional vector to a vector of a pointer.
+        let output: Vec<_> = output.iter_mut().map(|o| o.as_mut().as_mut_ptr()).collect();
+        if output.len() > 0 {
+            unsafe { rubberband_retrieve(self.inner, output.as_ptr(), output.len() as _) as _ }
         } else {
             0
         }
