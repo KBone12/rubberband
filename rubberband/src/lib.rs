@@ -60,19 +60,18 @@ impl OfflineStretcher {
     /// use rubberband::OfflineStretcher;
     /// let mut stretcher = OfflineStretcher::new(44100, 2);
     /// let input = vec![
-    ///     vec![0.0, 0.0],
-    ///     vec![0.5, 0.5],
-    ///     vec![1.0, 1.0],
-    ///     vec![0.5, 0.5],
+    ///     vec![0.0, 0.5, 1.0, 0.5],
+    ///     vec![0.0, 0.5, 1.0, 0.5],
     /// ];
     /// stretcher.study(&input, true);
     /// ```
     pub fn study<I: AsRef<[f32]>>(&mut self, input: &[I], last: bool) {
-        // Convert a 2-dimensional vector to a vector of a pointer.
-        let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
         if input.len() > 0 {
+            let size = input.iter().map(|i| i.as_ref().len()).min().unwrap();
+            // Convert a 2-dimensional vector to a vector of a pointer.
+            let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
             unsafe {
-                rubberband_study(self.inner, input.as_ptr(), input.len() as _, last as _);
+                rubberband_study(self.inner, input.as_ptr(), size as _, last as _);
             }
         } else {
             unsafe {
@@ -88,7 +87,7 @@ impl OfflineStretcher {
     /// ```
     /// use rubberband::OfflineStretcher;
     /// let mut stretcher = OfflineStretcher::new(44100, 2);
-    /// let input = vec![vec![0.0, 0.0]; stretcher.samples_required()];
+    /// let input = vec![vec![0.0; stretcher.samples_required()]; stretcher.channel_count()];
     /// stretcher.process(&input, true);
     /// ```
     pub fn process<I: AsRef<[f32]>>(&mut self, input: &[I], last: bool) {
@@ -96,11 +95,12 @@ impl OfflineStretcher {
             return;
         }
 
-        // Convert a 2-dimensional vector to a vector of a pointer.
-        let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
         if input.len() > 0 {
+            let size = input.iter().map(|i| i.as_ref().len()).min().unwrap();
+            // Convert a 2-dimensional vector to a vector of a pointer.
+            let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
             unsafe {
-                rubberband_process(self.inner, input.as_ptr(), input.len() as _, last as _);
+                rubberband_process(self.inner, input.as_ptr(), size as _, last as _);
             }
         } else {
             unsafe {
@@ -134,15 +134,16 @@ impl OfflineStretcher {
     /// use rubberband::OfflineStretcher;
     /// let mut stretcher = OfflineStretcher::new(44100, 2);
     /// if let Ok(available) = stretcher.available() {
-    ///     let mut output = vec![vec![0.0, 0.0]; available];
+    ///     let mut output = vec![vec![0.0; available]; stretcher.channel_count()];
     ///     stretcher.retrieve(&mut output);
     /// }
     /// ```
     pub fn retrieve<O: AsMut<[f32]>>(&mut self, output: &mut [O]) -> usize {
-        // Convert a 2-dimensional vector to a vector of a pointer.
-        let output: Vec<_> = output.iter_mut().map(|o| o.as_mut().as_mut_ptr()).collect();
         if output.len() > 0 {
-            unsafe { rubberband_retrieve(self.inner, output.as_ptr(), output.len() as _) as _ }
+            let size = output.iter_mut().map(|o| o.as_mut().len()).min().unwrap();
+            // Convert a 2-dimensional vector to a vector of a pointer.
+            let output: Vec<_> = output.iter_mut().map(|o| o.as_mut().as_mut_ptr()).collect();
+            unsafe { rubberband_retrieve(self.inner, output.as_ptr(), size as _) as _ }
         } else {
             0
         }
@@ -453,15 +454,16 @@ impl RealTimeStretcher {
     /// ```
     /// use rubberband::RealTimeStretcher;
     /// let mut stretcher = RealTimeStretcher::new(44100, 2);
-    /// let input = vec![vec![0.0, 0.0]; stretcher.samples_required()];
+    /// let input = vec![vec![0.0; stretcher.samples_required()]; stretcher.channel_count()];
     /// stretcher.process(&input, true);
     /// ```
     pub fn process<I: AsRef<[f32]>>(&mut self, input: &[I], last: bool) {
-        // Convert a 2-dimensional vector to a vector of a pointer.
-        let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
         if input.len() > 0 {
+            let size = input.iter().map(|i| i.as_ref().len()).min().unwrap();
+            // Convert a 2-dimensional vector to a vector of a pointer.
+            let input: Vec<_> = input.iter().map(|i| i.as_ref().as_ptr()).collect();
             unsafe {
-                rubberband_process(self.inner, input.as_ptr(), input.len() as _, last as _);
+                rubberband_process(self.inner, input.as_ptr(), size as _, last as _);
             }
         } else {
             unsafe {
@@ -495,15 +497,16 @@ impl RealTimeStretcher {
     /// use rubberband::RealTimeStretcher;
     /// let mut stretcher = RealTimeStretcher::new(44100, 2);
     /// if let Ok(available) = stretcher.available() {
-    ///     let mut output = vec![vec![0.0, 0.0]; available];
+    ///     let mut output = vec![vec![0.0; available]; stretcher.channel_count()];
     ///     stretcher.retrieve(&mut output);
     /// }
     /// ```
     pub fn retrieve<O: AsMut<[f32]>>(&mut self, output: &mut [O]) -> usize {
-        // Convert a 2-dimensional vector to a vector of a pointer.
-        let output: Vec<_> = output.iter_mut().map(|o| o.as_mut().as_mut_ptr()).collect();
         if output.len() > 0 {
-            unsafe { rubberband_retrieve(self.inner, output.as_ptr(), output.len() as _) as _ }
+            let size = output.iter_mut().map(|o| o.as_mut().len()).min().unwrap();
+            // Convert a 2-dimensional vector to a vector of a pointer.
+            let output: Vec<_> = output.iter_mut().map(|o| o.as_mut().as_mut_ptr()).collect();
+            unsafe { rubberband_retrieve(self.inner, output.as_ptr(), size as _) as _ }
         } else {
             0
         }
